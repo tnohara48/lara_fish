@@ -1,0 +1,50 @@
+/* 共通 */
+body {
+  background-color: #F1F1F1;
+}
+
+/* 商品/商品状態一覧画面 */
+.productName,
+.conditionMemo {
+  cursor: default;
+  /* 2行表示 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 3em;
+}
+
+#products {
+  min-height: 734px;
+}
+
+#conditions {
+  min-height: 490px;
+}
+
+/* 一覧の奇数行にスタイル適用 */
+.condition-info:nth-child(even),
+.product-info:nth-child(odd){
+  background-color: #fff7f7;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #DDD;
+}
+
+/* ページングタグの表示位置設定 */
+#pagingProducts {
+  display: inline-block;
+}
+
+#pagingProducts li {
+  display: inline-block;
+}
+
+#pagingConditions {
+  display: inline-block;
+}
+
+#pagingConditions li {
+  display: inline-block;
+}

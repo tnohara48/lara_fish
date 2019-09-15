@@ -1,0 +1,49 @@
+<?php
+require_once($_SERVER['DOCUMENT_ROOT'] . '/lara_fish/resources/views/classes/util/SessionUtil.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/lara_fish/resources/views/classes/util/CommonUtil.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/lara_fish/resources/views/classes/model/ProductsModel.php');
+
+// セッションスタート
+SessionUtil::sessionStart();
+
+// サニタイズ
+$post = CommonUtil::sanitaize($_POST);
+
+// データベースに登録する内容を連想配列にする
+$data = array(
+    'product_name' => $post['product_name'],
+    'product_memo' => $post['product_memo'],
+);
+
+try {
+    $db_product = new ProductsModel();
+
+    // トランザクション開始
+    $db_product->begin();
+
+    // 商品登録処理
+    $db_product->registerProduct($data);
+
+    // トースト表示の設定
+    $_SESSION['toast'] = "商品を登録しました";
+
+    // コミット
+    $db_product->commit();
+
+?>
+    <script>
+        location.href="{{ action('FishController@index') }}";
+    </script>
+<?php
+
+} catch (Exception $e) {
+
+    // ロールバック
+    $db_product->rollback();
+
+?>
+    <script>
+        location.href="{{ action('FishController@error') }}";
+    </script>
+<?php
+}

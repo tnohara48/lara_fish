@@ -1,0 +1,91 @@
+<?php
+require_once($_SERVER['DOCUMENT_ROOT'] . '/lara_fish/resources/views/classes/util/SessionUtil.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/lara_fish/resources/views/classes/util/CommonUtil.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/lara_fish/resources/views/classes/model/ConditionsModel.php');
+
+// セッションスタート
+SessionUtil::sessionStart();
+
+// サニタイズ
+$post = CommonUtil::sanitaize($_POST);
+
+try {
+    // 指定IDの商品状態を取得
+    $db_condition = new ConditionsModel();
+    $conditions = $db_condition->getConditionById($post['deleteConditionId']); //IDで商品状態取得
+    $conditionTypes = $db_condition->getConditionTypeAll();                  //商品状態をマスターから取得し動的表示
+} catch (Exception $e) {
+    header('Location: ../error/error.php');
+}
+
+?>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>商品状態削除</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/function.js"></script>
+</head>
+
+<body>
+    <!-- ヘッダー -->
+    <nav class="navbar navbar-dark bg-dark sticky-top">
+        <div class="col">
+            <button type="button" class="btn btn-danger mx-1" onclick="location.href='./index.php'">一覧</button>
+            <button type="button" class="btn btn-danger mx-1" onclick="location.href='./entry_product.php'">商品名登録</button>
+            <button type="button" class="btn btn-danger mx-1" onclick="location.href='./entry_condition.php'">状態登録</button>
+        </div>
+    </nav>
+
+    <div class="container col-8">
+        <form action="./delete_action_condition.php" method="post">
+            <div class="row mt-5">
+                <input type="hidden" name="conditionId" id="conditionId" value="<?= $post['deleteConditionId'] ?>">
+
+                <!-- 商品状態メモ入力ボックス -->
+                <label for="condition_memo">
+                    <h4 class="text-secondary font-weight-bold ml-2 mb-0">商品状態</h4>
+                </label>
+                <textarea class="form-control" name="condition_memo" id="condition_memo" rows="20" readonly><?= $conditions['condition_memo'] ?></textarea>
+
+                <!-- 商品状態ボタン -->
+                <div class="mx-auto mt-3">
+
+                    <?php
+                    foreach ($conditionTypes as $conditionType) {
+                        if ($conditionType['condition_id'] == $conditions['condition_id']) {
+                            ?>
+
+                            <button type="submit" class="btn-sm mx-1 btn-primary" name="v<?= $conditionType['condition_id'] ?>" disabled><?= $conditionType['condition_type'] ?></button>
+
+                            <?php
+                            continue;
+                        }
+                        ?>
+                        <button type="submit" class="btn-sm mx-1 btn-secondary" name="v<?= $conditionType['condition_id'] ?>" disabled><?= $conditionType['condition_type'] ?></button>
+                    <?php
+                    }
+                    ?>
+
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="mx-auto my-4">
+                    <button type="submit" class="btn btn-lg btn-danger submitConditionBtn">削除</button>
+                    <button type="button" class="btn btn-lg btn-dark mx-3" id="cancelBtn" onclick="location.href='./index.php'">キャンセル</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>
